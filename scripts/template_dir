@@ -1,0 +1,82 @@
+
+target_sdk_dir=""
+
+usage ()
+{
+	echo "Usage : $TOOLCHAIN_NAME -- -d <dir>" 
+	exit 1
+}
+
+if [ "$#" -ge 3 ]
+then
+	usage
+fi
+
+while [ "$1" != "" ]; do
+	case $1 in
+		-d )	shift
+				target_sdk_dir=$1
+				;;
+		* )		usage
+	esac
+	shift
+done
+
+spinner()
+{
+	local pid=$1
+	local delay=0.175
+	local spinstr='|/-\'
+	local infotext=$2
+	while kill -0 $pid 2>/dev/null ; do
+		local temp=${spinstr#?}
+		printf " [%c] %s" "$spinstr" "$infotext"
+		local spinstr=$temp${spinstr%"$temp"}
+		sleep $delay
+		printf "\b\b\b\b\b\b"
+		for i in $(seq 1 ${#infotext}); do
+			printf "\b"
+		done
+	done
+	printf " [*] %s" "$infotext"
+	printf " \b\b\b\b"
+}
+
+if [ "$target_sdk_dir" = "" ]; then
+	read -e -p "Enter target directory for SDK (default: $DEFAULT_INSTALL_DIR): " target_sdk_dir
+	[ "$target_sdk_dir" = "" ] && target_sdk_dir=$DEFAULT_INSTALL_DIR
+fi
+
+eval target_sdk_dir=$(echo "$target_sdk_dir"|sed 's/ /\\ /g')
+if [ -d "$target_sdk_dir" ]; then
+	target_sdk_dir=$(cd "$target_sdk_dir"; pwd)
+else
+	target_sdk_dir=$(readlink -m "$target_sdk_dir")
+fi
+
+if [ -n "$(echo $target_sdk_dir|grep ' ')" ]; then
+	echo "The target directory path ($target_sdk_dir) contains spaces. Abort!"
+	exit 1
+fi
+
+echo "Installing SDK to $target_sdk_dir"
+
+if [ -d $target_sdk_dir ]; then
+	# If the directory exists, test for write permission
+	if [ ! -w $target_sdk_dir ] ; then
+		echo "No permission, please run as 'sudo'"
+		exit 1
+	fi
+else
+	echo "Creating directory $target_sdk_dir"
+	# Try to create the directory (this will not succeed if user doesn't have rights)
+	if install -d -m 0751 $target_sdk_dir >/dev/null 2>&1  ; then
+		echo "Success"
+	else
+		echo "No permission, please run as 'sudo'"
+		exit 1
+	fi
+fi 
+
+
+

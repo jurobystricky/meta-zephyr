@@ -1,0 +1,92 @@
+diff --git meta/classes/insane.bbclass meta/classes/insane.bbclass
+index 5c8629a..66f23d8 100644
+--- meta/classes/insane.bbclass
++++ meta/classes/insane.bbclass
+@@ -62,9 +62,11 @@ def package_qa_get_machine_dict():
+                         "arm" :       (40,     0,    0,          True,          32),
+                       },
+             "elf" : {
++                        "arc" :       (195,    0,    0,          True,          32),
+                         "i586" :      (3,      0,    0,          True,          32),
+                         "x86_64":     (62,     0,    0,          True,          64),
+                         "epiphany":   (4643,   0,    0,          True,          32),
++                        "mips":       ( 8,     0,    0,          False,         32),
+                       },
+             "linux" : { 
+                         "aarch64" :   (183,    0,    0,          True,          64),
+diff --git meta/classes/kernel-arch.bbclass meta/classes/kernel-arch.bbclass
+index 211b72b..3ffe47c 100644
+--- meta/classes/kernel-arch.bbclass
++++ meta/classes/kernel-arch.bbclass
+@@ -31,6 +31,7 @@ def map_kernel_arch(a, d):
+     elif re.match('microblazee[bl]', a):        return 'microblaze'
+     elif a in valid_archs:                      return a
+     else:
++        if d.getVar("TCLIBC", True) == "baremetal": return a;
+         bb.error("cannot map '%s' to a linux kernel architecture" % a)
+ 
+ export ARCH = "${@map_kernel_arch(d.getVar('TARGET_ARCH', True), d)}"
+diff --git meta/classes/siteinfo.bbclass meta/classes/siteinfo.bbclass
+index 9f6eac4..eb302bc 100644
+--- meta/classes/siteinfo.bbclass
++++ meta/classes/siteinfo.bbclass
+@@ -20,6 +20,7 @@ def siteinfo_data(d):
+         "allarch": "endian-little bit-32", # bogus, but better than special-casing the checks below for allarch
+         "aarch64": "endian-little bit-64 arm-common arm-64",
+         "aarch64_be": "endian-big bit-64 arm-common arm-64",
++        "arc": "endian-little bit-32",
+         "arm": "endian-little bit-32 arm-common arm-32",
+         "armeb": "endian-big bit-32 arm-common arm-32",
+         "avr32": "endian-big bit-32 avr32-common",
+@@ -30,6 +31,7 @@ def siteinfo_data(d):
+         "i586": "endian-little bit-32 ix86-common",
+         "i686": "endian-little bit-32 ix86-common",
+         "ia64": "endian-little bit-64",
++        "iamcu": "endian-little bit-32",
+         "microblaze": "endian-big bit-32 microblaze-common",
+         "microblazeeb": "endian-big bit-32 microblaze-common",
+         "microblazeel": "endian-little bit-32 microblaze-common",
+diff --git meta/recipes-devtools/binutils/binutils-2.25.1.inc meta/recipes-devtools/binutils/binutils-2.25.1.inc
+index f3817fa..637a1b7 100644
+--- meta/recipes-devtools/binutils/binutils-2.25.1.inc
++++ meta/recipes-devtools/binutils/binutils-2.25.1.inc
+@@ -35,6 +35,7 @@ SRC_URI = "\
+      file://0015-Fix-dynamic-list-so-that-symbols-not-in-the-list-are.patch \
+      file://binutils-octeon3.patch \
+      file://add-thunderx-support-for-gas.patch \
++     file://add-trad-vectors-for-mips-elf.patch \
+      "
+ S  = "${WORKDIR}/git"
+ 
+diff --git meta/recipes-devtools/gcc/libgcc-common.inc meta/recipes-devtools/gcc/libgcc-common.inc
+index b09ea65..5cc3b30 100644
+--- meta/recipes-devtools/gcc/libgcc-common.inc
++++ meta/recipes-devtools/gcc/libgcc-common.inc
+@@ -45,10 +45,6 @@ do_install () {
+ 	rm -rf ${D}${libdir}/${TARGET_SYS}/${BINV}/include
+ }
+ 
+-do_install_append_libc-baremetal () {
+-	rmdir ${D}${base_libdir}
+-}
+-
+ RDEPENDS_${PN}-dev_libc-baremetal = ""
+ 
+ BBCLASSEXTEND = "nativesdk"
+diff --git meta/recipes-devtools/gcc/libgcc.inc meta/recipes-devtools/gcc/libgcc.inc
+index 739adbd..95709e4 100644
+--- meta/recipes-devtools/gcc/libgcc.inc
++++ meta/recipes-devtools/gcc/libgcc.inc
+@@ -28,6 +28,12 @@ FILES_${PN}-dev = "\
+     ${libdir}/${TARGET_SYS}/${BINV}/libgcov.a \
+ "
+ 
++FILES_${PN}-dev_libc-baremetal = "\
++    ${base_libdir}/ \
++    ${libdir}/* \
++    ${libdir}/${TARGET_SYS}/* \
++"
++
+ FILES_${PN}-dbg += "${base_libdir}/.debug/"
+ 
+ LIBGCCBUILDTREENAME = "gcc-build-internal-"
