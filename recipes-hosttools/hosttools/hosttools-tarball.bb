@@ -20,6 +20,7 @@ TOOLCHAIN_HOST_TASK ?= "\
     nativesdk-make \
     nativesdk-qemu \
     nativesdk-python \
+    nativesdk-openocd \
     "
 
 TOOLCHAIN_OUTPUTNAME ?= "${DISTRO}-${SDKMACHINE}-hosttools-standalone-${DISTRO_VERSION}"
