@@ -37,7 +37,7 @@
 # Edit as needed:
 version_major=0
 version_minor=6
-product_name=zephyr-sdk-BETA
+product_name=zephyr-sdk
 
 # Create ./setup.sh 
 
