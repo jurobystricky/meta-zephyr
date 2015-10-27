@@ -1,23 +1,47 @@
 
 target_sdk_dir=""
+post_install_cleanup=1
+confirm=0
 
-usage ()
-{
-	echo "Usage : $TOOLCHAIN_NAME -- -d <dir>" 
-	exit 1
+usage () {
+  cat << EOF
+  Usage : $TOOLCHAIN_NAME < -- options >
+
+
+Options:
+  -h
+        Display this help and exit.
+
+  -d <dir>
+        Specify the absolute path of the SDK installation directory.
+
+  -y
+        Automatic yes to prompts; assume "yes" as answer to all prompts.
+
+EOF
 }
-
-if [ "$#" -ge 3 ]
-then
-	usage
-fi
 
 while [ "$1" != "" ]; do
 	case $1 in
-		-d )	shift
-				target_sdk_dir=$1
-				;;
-		* )		usage
+	    -h )
+			usage
+			exit 0
+			;;
+		-d )
+			shift
+			target_sdk_dir=$1
+			;;
+		-nocleanup )
+			post_install_cleanup=0;
+			;;
+		-y )
+			confirm="y";
+			;;
+		* )
+			echo "Error: Invalid argument \"$1\""
+			usage
+			exit 1
+			;;
 	esac
 	shift
 done
@@ -42,9 +66,40 @@ spinner()
 	printf " \b\b\b\b"
 }
 
+do_cleanup()
+{
+	if [ $post_install_cleanup = "1" ]; then
+	    cd $target_sdk_dir
+	    rm site-config*
+	    rm environment-setup*
+	fi
+}
+
+# Read the input "y"
+read_confirm () {
+  echo "The existing directory $target_sdk_dir will be removed! "
+  if [ "$confirm" != "y" ]; then
+      echo "Do you want to continue (y/n)? "
+      while read confirm; do
+          [ "$confirm" = "Y" -o "$confirm" = "y" -o "$confirm" = "n" \
+            -o "$confirm" = "N" ] && break
+          echo "Invalid input \"$confirm\", please input 'y' or 'n': "
+      done
+  else
+      echo
+  fi
+}
+
 if [ "$target_sdk_dir" = "" ]; then
 	read -e -p "Enter target directory for SDK (default: $DEFAULT_INSTALL_DIR): " target_sdk_dir
 	[ "$target_sdk_dir" = "" ] && target_sdk_dir=$DEFAULT_INSTALL_DIR
+fi
+
+eval target_sdk_dir=$target_sdk_dir
+
+if [[ $target_sdk_dir != /* ]]; then
+	echo "The target directory path ($target_sdk_dir) must be an absolute path. Abort!"
+	exit 1;
 fi
 
 eval target_sdk_dir=$(echo "$target_sdk_dir"|sed 's/ /\\ /g')
@@ -66,6 +121,12 @@ if [ -d $target_sdk_dir ]; then
 	if [ ! -w $target_sdk_dir ] ; then
 		echo "No permission, please run as 'sudo'"
 		exit 1
+	else
+		# wipe the directory first
+		read_confirm
+	    if [ "$confirm" = "y" -o "$confirm" = "Y" ]; then
+		    rm -rf $target_sdk_dir/*
+		fi
 	fi
 else
 	echo "Creating directory $target_sdk_dir"
@@ -76,7 +137,7 @@ else
 		echo "No permission, please run as 'sudo'"
 		exit 1
 	fi
-fi 
+fi
 
 
 
