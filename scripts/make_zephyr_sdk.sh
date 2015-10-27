@@ -1,5 +1,5 @@
 #!/bin/sh
-# 
+#
 # The folder "toolchains" should contain several individually installable toolchains.
 # This script merges the toolchains into a single installable file.
 #
@@ -17,7 +17,7 @@
 # Major versions for big interface/usage changes
 # Minor versions for additions of interfaces, transparent changes
 #
-# Default installation directory should be /opt/zephyr-sdk/M.m/
+# Default installation directory should be /opt/zephyr-sdk/
 #
 # Naming scheme: 1st drop
 #    zephyr-sdk-0.1-i686-setup.run
@@ -36,23 +36,50 @@
 
 # Edit as needed:
 version_major=0
-version_minor=6
-product_name=zephyr-sdk
+version_minor=7
 
-# Create ./setup.sh 
+if [ "$1" != "" ] ; then
+    product_name=$1
+  else
+    product_name=zephyr-sdk
+fi
+
+# Create ./setup.sh
 
 sdk_version=$version_major.$version_minor
 setup=toolchains/setup.sh
-default_dir=/opt/${product_name}/${sdk_version}
+default_dir=/opt/${product_name}/
 toolchain_name=${product_name}-${sdk_version}-i686-setup.run
 
 # Identify files present in toolchains folder
-file_gcc_arm=$(ls toolchains | grep arm)
-file_gcc_arc=$(ls toolchains | grep arc)
-file_gcc_x86=$(ls toolchains | grep i586)
-file_gcc_iamcu=$(ls toolchains | grep iamcu)
-file_gcc_mips=$(ls toolchains | grep mips32r2)
-file_hosttools=$(ls toolchains | grep hosttools)
+
+function parse_toolchain_name()
+{
+    local varname=$1
+    local arch=$2
+    local num
+    local filename
+
+    num=$(ls toolchains | grep $arch | wc -l)
+    if [ "$num" -gt "1" ]; then
+        echo "Error: Multiple toolchains for \"$arch\" "
+        exit 1
+    fi
+
+    if [ "$num" -eq "0" ]; then
+        echo "Warning: Missing toolchain for \"$arch\" "
+    fi
+
+    filename=$(ls toolchains | grep $arch)
+    eval "$varname=\$filename"
+}
+
+parse_toolchain_name file_gcc_arm arm
+parse_toolchain_name file_gcc_arc arc
+parse_toolchain_name file_gcc_x86 i586
+parse_toolchain_name file_gcc_iamcu iamcu
+parse_toolchain_name file_gcc_mips mips32r2
+parse_toolchain_name file_hosttools hosttools
 
 echo '#!/bin/bash' > $setup
 echo "DEFAULT_INSTALL_DIR=$default_dir" >> $setup
@@ -101,7 +128,12 @@ if [ -n "$file_hosttools" ]; then
   echo "echo \"\"" >>$setup
 fi
 
+
+echo "" >>$setup
+echo "do_cleanup"  >>$setup
+echo "" >>$setup
+
 echo "echo \"Success installing SDK. SDK is ready to be used.\"" >>$setup
 chmod 777 $setup
 
-makeself toolchains/ $toolchain_name  "SDK for Zephyr" ./setup.sh 
+makeself toolchains/ $toolchain_name  "SDK for Zephyr" ./setup.sh
