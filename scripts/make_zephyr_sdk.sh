@@ -81,41 +81,47 @@ parse_toolchain_name file_gcc_iamcu iamcu
 parse_toolchain_name file_gcc_mips mips32r2
 parse_toolchain_name file_hosttools hosttools
 
+# Host tools are non-optional
+if  [ -z "$file_hosttools" ]; then
+  echo "Error: Missing host tools!"
+  exit 1
+fi
+
 echo '#!/bin/bash' > $setup
 echo "DEFAULT_INSTALL_DIR=$default_dir" >> $setup
 echo "TOOLCHAIN_NAME=$toolchain_name" >> $setup
 cat template_dir >>$setup
 
 if [ -n "$file_gcc_x86" ]; then
-  echo "./$file_gcc_x86 -y -d \$target_sdk_dir > /dev/null &" >> $setup
+  echo "./$file_gcc_x86 -R -y -d \$target_sdk_dir > /dev/null &" >> $setup
   echo "spinner \$! \"Installing x86 tools...\"" >> $setup
   echo "[ \$? -ne 0 ] && echo \"Error(s) encountered during installation.\" && exit 1" >>$setup
   echo "echo \"\"" >>$setup
 fi
 
 if [ -n "$file_gcc_arm" ]; then
-  echo "./$file_gcc_arm -y -d \$target_sdk_dir > /dev/null &" >> $setup
+  echo "./$file_gcc_arm -R -y -d \$target_sdk_dir > /dev/null &" >> $setup
   echo "spinner \$! \"Installing arm tools...\"" >> $setup
   echo "[ \$? -ne 0 ] && echo \"Error(s) encountered during installation.\" && exit 1" >>$setup
   echo "echo \"\"" >>$setup
 fi
 
 if [ -n "$file_gcc_arc" ]; then
-  echo "./$file_gcc_arc -y -d \$target_sdk_dir > /dev/null &" >> $setup
+  echo "./$file_gcc_arc -R -y -d \$target_sdk_dir > /dev/null &" >> $setup
   echo "spinner \$!  \"Installing arc tools...\"" >> $setup
   echo "[ \$? -ne 0 ] && echo \"Error(s) encountered during installation.\" && exit 1" >>$setup
   echo "echo \"\"" >>$setup
 fi
 
 if [ -n "$file_gcc_iamcu" ]; then
-  echo "./$file_gcc_iamcu -y -d \$target_sdk_dir > /dev/null &" >> $setup
+  echo "./$file_gcc_iamcu -R -y -d \$target_sdk_dir > /dev/null &" >> $setup
   echo "spinner \$!  \"Installing iamcu tools...\"" >> $setup
   echo "[ \$? -ne 0 ] && echo \"Error(s) encountered during installation.\" && exit 1" >>$setup
   echo "echo \"\"" >>$setup
 fi
 
 if [ -n "$file_gcc_mips" ]; then
-  echo "./$file_gcc_mips -y -d \$target_sdk_dir > /dev/null &" >> $setup
+  echo "./$file_gcc_mips -R -y -d \$target_sdk_dir > /dev/null &" >> $setup
   echo "spinner \$!  \"Installing mips tools...\"" >> $setup
   echo "[ \$? -ne 0 ] && echo \"Error(s) encountered during installation.\" && exit 1" >>$setup
   echo "echo \"\"" >>$setup
