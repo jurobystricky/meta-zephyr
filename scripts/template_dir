@@ -70,7 +70,7 @@ do_cleanup()
 {
 	if [ $post_install_cleanup = "1" ]; then
 	    cd $target_sdk_dir
-	    rm site-config*
+	    #rm site-config*
 	    rm environment-setup*
 	fi
 }
