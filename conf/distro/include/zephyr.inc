@@ -1,5 +1,6 @@
 SANITY_TESTED_DISTROS = " \
             Ubuntu-14.04 \n \
+            Ubuntu-15.04 \n \
             "
 
 DISTRO = "zephyr"
