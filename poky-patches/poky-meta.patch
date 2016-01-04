@@ -1,3 +1,18 @@
+diff --git bitbake/lib/bb/fetch2/__init__.py bitbake/lib/bb/fetch2/__init__.py
+index 288a1c8..8c80d7d 100644
+--- bitbake/lib/bb/fetch2/__init__.py
++++ bitbake/lib/bb/fetch2/__init__.py
+@@ -1407,6 +1407,10 @@ class FetchMethod(object):
+                     cmd = 'rpm2cpio.sh %s | cpio -id' % (file)
+             elif file.endswith('.deb') or file.endswith('.ipk'):
+                 cmd = 'ar -p %s data.tar.gz | zcat | tar --no-same-owner -xpf -' % file
++            elif file.endswith('.tar.7z'):
++                cmd = '7z x -so %s | tar xf - ' % file
++            elif file.endswith('.7z'):
++                cmd = '7za x -y %s 1>/dev/null' % file
+
+         if not unpack or not cmd:
+             # If file == dest, then avoid any copies, as we already put the file into dest!
 diff --git meta/classes/insane.bbclass meta/classes/insane.bbclass
 index 5c8629a..66f23d8 100644
 --- meta/classes/insane.bbclass
@@ -14,6 +29,23 @@ index 5c8629a..66f23d8 100644
                        },
              "linux" : { 
                          "aarch64" :   (183,    0,    0,          True,          64),
+@@ -292,6 +294,7 @@ def package_qa_check_libdir(d):
+     pkgdest = d.getVar('PKGDEST', True)
+     base_libdir = d.getVar("base_libdir",True) + os.sep
+     libdir = d.getVar("libdir", True) + os.sep
++    libexecdir = d.getVar("libexecdir", True) + os.sep
+     exec_prefix = d.getVar("exec_prefix", True) + os.sep
+
+     messages = []
+@@ -319,7 +322,7 @@ def package_qa_check_libdir(d):
+                     if base_libdir not in rel_path:
+                         messages.append("%s: found library in wrong location: %s" % (package, rel_path))
+                 if exec_re.match(rel_path):
+-                    if libdir not in rel_path:
++                    if libdir not in rel_path and libexecdir not in rel_path:
+                         messages.append("%s: found library in wrong location: %s" % (package, rel_path))
+
+     if messages:
 diff --git meta/classes/kernel-arch.bbclass meta/classes/kernel-arch.bbclass
 index 211b72b..3ffe47c 100644
 --- meta/classes/kernel-arch.bbclass
