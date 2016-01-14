@@ -18,7 +18,7 @@ TOOLCHAIN_HOST_TASK ?= "\
     nativesdk-libstdc++ \
     nativesdk-libstdc++-dev \
     nativesdk-make \
-    nativesdk-qemu \
+    nativesdk-zephyr-qemu \
     nativesdk-python \
     nativesdk-openocd \
     "
