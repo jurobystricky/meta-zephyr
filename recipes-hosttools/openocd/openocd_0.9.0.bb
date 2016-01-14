@@ -4,7 +4,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 DEPENDS = "libusb-compat"
 RDEPENDS_${PN} = "libusb1"
 
-SRC_URI = "git://git.code.sf.net/p/openocd/code;tag=v0.9.0"
+SRC_URI = " \
+	git://git.code.sf.net/p/openocd/code;tag=v0.9.0 \
+	file://d089da2b.patch \
+	"
+
 S = "${WORKDIR}/git"
 
 inherit pkgconfig autotools gettext
