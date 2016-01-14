@@ -35,9 +35,10 @@ TUNE_CCARGS_arm := "-nostdlib"
 # This will determine the name of the folder with libgcc as well.
 NEWLIB_HOST = "${TARGET_SYS}"
 
+CFLAGS += " -DMISSING_SYSCALL_NAMES "
 
 # Specify any options you want to pass to the configure script using EXTRA_OECONF:
-EXTRA_OECONF = " --enable-languages=c,c++ \
+EXTRA_OECONF = " --enable-languages=c \
     --host=${NEWLIB_HOST} \
     --with-newlib --with-gnu-as --with-gnu-ld -v \
 "
