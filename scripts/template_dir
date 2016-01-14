@@ -126,6 +126,10 @@ if [ -d $target_sdk_dir ]; then
 		read_confirm
 	    if [ "$confirm" = "y" -o "$confirm" = "Y" ]; then
 		    rm -rf $target_sdk_dir/*
+		else
+		    # Abort the installation
+		    echo "SDK installation aborted!"
+		    exit 1
 		fi
 	fi
 else
