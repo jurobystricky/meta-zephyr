@@ -37,6 +37,7 @@
 # Edit as needed:
 version_major=0
 version_minor=7
+subversion_minor=1
 
 if [ "$1" != "" ] ; then
     product_name=$1
@@ -46,7 +47,12 @@ fi
 
 # Create ./setup.sh
 
-sdk_version=$version_major.$version_minor
+if [ "$subversion_minor" -ne "0" ]; then
+    sdk_version=$version_major.$version_minor.$subversion_minor
+else
+    sdk_version=$version_major.$version_minor
+fi
+
 setup=toolchains/setup.sh
 default_dir=/opt/${product_name}/
 toolchain_name=${product_name}-${sdk_version}-i686-setup.run
