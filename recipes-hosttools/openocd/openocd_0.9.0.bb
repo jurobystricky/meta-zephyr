@@ -7,6 +7,7 @@ RDEPENDS_${PN} = "libusb1"
 SRC_URI = " \
 	git://git.code.sf.net/p/openocd/code;tag=v0.9.0 \
 	file://d089da2b.patch \
+	file://zephyr-sdk.patch \
 	"
 
 S = "${WORKDIR}/git"
@@ -18,11 +19,11 @@ BBCLASSEXTEND += "nativesdk"
 EXTRA_OECONF = "--enable-ftdi --disable-doxygen-html "
 
 do_configure() {
-    cd ${S} 
+    cd ${S}
     export ALL_PROXY="${ALL_PROXY}"
     export GIT_PROXY_COMMAND=${GIT_PROXY_COMMAND}
     ./bootstrap
-    oe_runconf ${EXTRA_OECONF}
+    oe_runconf ${EXTRA_OECONF} 
 }
 
 do_install() {
@@ -39,3 +40,6 @@ do_install() {
     fi
 }
 
+FILES_${PN} = " \
+   /opt/zephyr-sdk \
+  "
