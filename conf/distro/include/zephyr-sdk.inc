@@ -3,8 +3,8 @@ SANITY_TESTED_DISTROS = " \
             Ubuntu-15.04 \n \
             "
 
-DISTRO = "zephyr"
-DISTRO_CODENAME = "zephyr"
+DISTRO = "zephyr-sdk"
+DISTRO_CODENAME = "zephyr-sdk"
 DISTRO_NAME = "Zephyr Yocto Toolchain"
 MAINTAINER = "Intel Yocto team"
 
