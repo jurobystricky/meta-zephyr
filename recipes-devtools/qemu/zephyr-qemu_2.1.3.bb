@@ -215,7 +215,7 @@ do_install_append() {
 }
 
 FILES_${PN} = " \
-   /opt/poky \
+   /opt/zephyr-sdk \
   "
 
 #INSANE_SKIP_${PN} = "arch"
