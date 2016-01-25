@@ -5,11 +5,12 @@ DEPENDS = "libusb-compat"
 RDEPENDS_${PN} = "libusb1"
 
 SRC_URI = " \
-	git://git.code.sf.net/p/openocd/code;tag=v0.9.0 \
-	file://d089da2b.patch \
+	git://git.code.sf.net/p/openocd/code \
+	file://ISSM_QuarkSE.patch \
 	file://zephyr-sdk.patch \
 	"
 
+SRCREV = "94d64ccaebd3df17f5873c076fc08ca97088cb1e"
 S = "${WORKDIR}/git"
 
 inherit pkgconfig autotools gettext

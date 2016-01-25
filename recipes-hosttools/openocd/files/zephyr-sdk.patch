@@ -2,7 +2,7 @@ diff --git a/src/helper/options.c b/src/helper/options.c
 index 5351e82..7cb3f84 100644
 --- a/src/helper/options.c
 +++ b/src/helper/options.c
-@@ -95,9 +95,11 @@ static void add_default_dirs(void)
+@@ -95,8 +95,10 @@ static void add_default_dirs(void)
  	run_prefix = "";
  #endif
  
@@ -13,14 +13,13 @@ index 5351e82..7cb3f84 100644
  	LOG_DEBUG("run_prefix=%s", run_prefix);
  
  	/*
- 	 * The directory containing OpenOCD-supplied scripts should be
-@@ -125,6 +127,23 @@ static void add_default_dirs(void)
+@@ -124,7 +126,23 @@ static void add_default_dirs(void)
+ 		}
  	}
  #endif
- 
 +#if 1 /* ZEPHYR_SDK */
 +	const char *zephyr_sdk = getenv("ZEPHYR_SDK_INSTALL_DIR");
-+
+ 
 +	if (zephyr_sdk) {
 +		path = alloc_printf("%s/sysroots/i686-pokysdk-linux/usr/share/openocd/site", zephyr_sdk);
 +		if (path) {
@@ -38,11 +37,12 @@ index 5351e82..7cb3f84 100644
  	path = alloc_printf("%s%s%s", run_prefix, PKGDATADIR, "/site");
  	if (path) {
  		add_script_search_dir(path);
-@@ -136,6 +155,7 @@ static void add_default_dirs(void)
+@@ -136,6 +154,8 @@ static void add_default_dirs(void)
  		add_script_search_dir(path);
  		free(path);
  	}
 +#endif
++
+ 	add_script_search_dir("../scripts");
+ 	add_script_search_dir("scripts");
  }
- 
- int parse_cmdline_args(struct command_context *cmd_ctx, int argc, char *argv[])
