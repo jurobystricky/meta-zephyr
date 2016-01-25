@@ -1,6 +1,5 @@
 
-create_sdk_files_append_zephyr() {
-
+create_sdk_files_append_zephyr-sdk() {
 	rm -fv ${SDK_OUTPUT}/${SDKPATH}/site-config-*
 
 	# We need to keep environment-setup-* file becuse the SDK relocate info is
