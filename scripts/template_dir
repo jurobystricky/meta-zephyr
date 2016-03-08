@@ -21,6 +21,32 @@ Options:
 EOF
 }
 
+verify_os () {
+case "$(uname -s)" in
+
+   Darwin)
+     echo 'OS X is not supported!'
+     exit 1
+     ;;
+
+   # Linux, the only supported OS
+
+   Linux)
+     #echo 'Linux'
+     ;;
+
+   # Other OS ...
+   # see https://en.wikipedia.org/wiki/Uname#Examples
+   # Don't allow to install on any of them, this includes cygwin, Windows,
+   # Solaris etc.
+
+   *)
+     echo 'Unsupported OS'
+     exit 1
+     ;;
+esac
+}
+
 while [ "$1" != "" ]; do
 	case $1 in
 	    -h )
@@ -89,6 +115,8 @@ read_confirm () {
       echo
   fi
 }
+
+verify_os
 
 if [ "$target_sdk_dir" = "" ]; then
 	read -e -p "Enter target directory for SDK (default: $DEFAULT_INSTALL_DIR): " target_sdk_dir
